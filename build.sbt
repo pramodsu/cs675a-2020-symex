@@ -1,4 +1,4 @@
-name := "cs675-hello-smt"
+name := "cs675-symex"
 version := "1.0.0"
 scalaVersion := "2.12.7"
  
