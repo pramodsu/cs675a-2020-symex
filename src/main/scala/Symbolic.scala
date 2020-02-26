@@ -30,4 +30,8 @@ object Symbolic
       case Not(e1) => _toInt(ctx.mkNot(_toBool(_eval(e))))
     }
   }
+
+  def exec(st: Stmt) : Unit = {
+    // TODO
+  }
 }

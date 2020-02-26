@@ -26,8 +26,11 @@ object Main
       AssignStmt("x", Val(1)),
       AssignStmt("y", Val(2)),
       AssignStmt("z", Plus(Var("x"), Var("y"))),
-      AssertStmt(Gt(Var("x"), Val(0)))
+      AssertStmt(Gt(Var("z"), Val(0)))
     ))
     println(Interpreter.run(prog4, Map.empty))
+
+    val expr = Gt(Plus(Var("x"), Var("y")), Val(1))
+    println(Symbolic.eval(expr, Map.empty))
   }
 }
