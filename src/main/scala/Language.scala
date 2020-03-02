@@ -16,6 +16,9 @@ case class Gt(e1: Expr, e2: Expr) extends Expr
 case class And(e1: Expr, e2: Expr) extends Expr
 case class Not(e: Expr) extends Expr
 
+// Input function: reads an input from the stream.
+case class Input() extends Expr
+
 // Statements.
 abstract class Stmt
 case class SkipStmt() extends Stmt
@@ -36,8 +39,8 @@ object Stmt
 
 object Interpreter {
   // Evaluate expressions.
-  def eval(e: Expr, values : Map[String, Int]) : Int = {
-    def _eval(e: Expr) = eval(e, values)
+  def eval(e: Expr, values : Map[String, Int], input: () => Int) : Int = {
+    def _eval(e: Expr) = eval(e, values, input)
     def _toInt (v : Boolean) = if (v) 1 else 0
     def _toBool (v : Int) = v != 0
     e match {
@@ -52,22 +55,24 @@ object Interpreter {
       // bool
       case And(e1, e2) => _toInt(_toBool(_eval(e1)) && _toBool(_eval(e2)))
       case Not(e1) => _toInt(!_toBool(_eval(e)))
+      // input
+      case Input() => input()
     }
   }
   // Execute statements
-  def run(s: Stmt, values: Map[String, Int]) : Map[String, Int] = {
+  def run(s: Stmt, values: Map[String, Int], input: () => Int) : Map[String, Int] = {
     s match {
       case SkipStmt() => values
-      case AssignStmt(v, rhs) => values + (v -> eval(rhs, values))
-      case SeqStmt(s1, s2) => run(s2, run(s1, values))
+      case AssignStmt(v, rhs) => values + (v -> eval(rhs, values, input))
+      case SeqStmt(s1, s2) => run(s2, run(s1, values, input), input)
       case IfElseStmt(e, s1, s2) =>
-        if (eval(e, values) != 0) {
-          run(s1, values)
+        if (eval(e, values, input) != 0) {
+          run(s1, values, input)
         } else {
-          run(s2, values)
+          run(s2, values, input)
         }
       case AssertStmt(e) =>
-        assert(eval(e, values) != 0)
+        assert(eval(e, values, input) != 0)
         values
     }
   }
